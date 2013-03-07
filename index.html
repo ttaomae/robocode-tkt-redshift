@@ -31,32 +31,33 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>Welcome to GitHub Pages.</h3>
+        <h1>robocode-tkt-redshift</h1>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<h2>About RedShift</h2>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<p>RedShift is a <a href="http://robocode.sourceforge.net/">Robocode</a> AdvancedRobot. It is primarily designed for one one one battles.The following outlines its basic strategy.</p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h3>Movement</h3>
 
-<h3>Designer Templates</h3>
+<p>RedShift attempts to always move and always stay perpendicular to the enemy. This strategy works well against <a href="http://robocode.sourceforge.net/">head-on targeting</a>. In addition, RedShift will also try to move closer to the enemy if it is too far or move farther if it is too close. Being closer to the target makes it easier to hit the target. However, this also means that the enemy will be able to hit you easier. The distance was chosen to try to balance these two factors.</p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<h3>Targeting and Firing</h3>
 
-<h3>Rather Drive Stick?</h3>
+<p>RedShift uses <a href="http://robowiki.net/wiki/Linear_Targeting">linear targeting</a>. Linear targeting assumes that the target will continue to move in the same direction with the same velocity and aims where the robot would be by the time your bullet reaches them. Since not all robots will follow this behavior, I keep track of multiple past velocities and use a <a href="http://en.wikipedia.org/wiki/Moving_average#Weighted_moving_average">weighted moving average</a> of these velocities rather than just the most recently scanned velocity. RedShift will fire at every opportunity that it can as long as it is not too far from the enemy. The firing power is inversely proportional to the distance from the target. As the distance from the target increases, the power decreases.</p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<h3>Vulnerabilities</h3>
 
-<h3>Authors and Contributors</h3>
+<p>Currently, RedShift is vulnerable to other linear targeting robots since it constantly moves in approximately the same direction. It also performs relatively poorly in melee battles. This is because much of the strategy assumes that there is only one other robot and it makes to adjustments when there are more robots.</p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<h2>Additional Info</h2>
 
-<h3>Support or Contact</h3>
+<p>For more details about the project, see the following pages:</p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<ul>
+<li><a href="">User Guide</a></li>
+<li><a href="">Developer Guide</a></li>
+<li><a href="">Contact Us</a></li>
+</ul>
       </section>
     </div>
 
