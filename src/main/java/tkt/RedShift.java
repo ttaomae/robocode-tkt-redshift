@@ -26,14 +26,22 @@ import tkt.util.RobotInfo;
  * @author Todd Taomae
  */
 public class RedShift extends AdvancedRobot {
+  /** Preferred distance from the enemy. */
   private static final double PREFERRED_DISTANCE = 200.0;
+  /** Plus/minus distance from the preferred distance. */
   private static final double DISTANCE_BUFFER = 50.0;
+  /** Maximum distance from the enemy where you will still fire. */
   private static final double MAX_FIRING_DISTANCE = 400.0;
+  /** Number of velocities being tracked. */
   private static int NUM_VELOCITIES = 1;
   /** True if this battle is a melee battle (more than two robots). */
   private static boolean IS_MELEE = false;
   /** Maps the number of velocities tracked to an accuracy. */
   private static Map<Integer, Double> accuracies = new HashMap<Integer, Double>();
+  /** The best enemy accuracy with dodging. */
+  private static double enemyAccuracyWithDodge = 0.0;
+  /** The best enemy accuracy without dodging. */
+  private static double enemyAccuracyWithoutDodge = 0.0;
 
   /** Defines the direction to move. 1 is forward, -1 is backward */
   private int direction = 1;
@@ -45,13 +53,17 @@ public class RedShift extends AdvancedRobot {
   private int hits = 0;
   /** Number of bullets that missed an enemy. */
   private int misses = 0;
+  /** True if you want to change directions each time the enemy fires. */
+  private boolean dodge = false;
   /** Random number generator. */
   private Random rng = new Random();
 
+  /** Helper for this robot. */
   private AdvancedRobotUtility roboUtil = new AdvancedRobotUtility(this);
 
   /**
-   * Spin gun to the right forever.
+   * On the first round, check if this is a melee battle. Sets up the necessary information
+   * at the start of each round.
    */
   @Override
   public void run() {
@@ -68,25 +80,35 @@ public class RedShift extends AdvancedRobot {
       RedShift.setMelee(this.getOthers() > 1);
     }
 
-    // determine how many velocities to keep track of
+    // determine how many velocities to keep track of and whether or not to dodge
     // if it is a melee battle
     if (RedShift.IS_MELEE) {
       out.println("is melee");
       // do not keep track of multiple velocities because you cannot guarantee that you will
       // always scan the same robot.
-      this.velocities = new BoundedQueue<Double>(1);
+      RedShift.setNumVelocities(1);
     }
 
     // if it is 1-vs-1
     else {
-      // for the first two round track 1 then 100
+      // on the first round
       if (this.getRoundNum() == 0) {
+        // track 1 velocity
         RedShift.setNumVelocities(1);
+        // don't dodge
+        this.dodge = false;
       }
+      // on the second round
       else if (this.getRoundNum() == 1) {
+        // track 50 velocities
         RedShift.setNumVelocities(50);
+        // dodge
+        this.dodge = true;
       }
       else {
+        // dodge if it is the better option
+        this.dodge = RedShift.enemyAccuracyWithDodge < RedShift.enemyAccuracyWithoutDodge;
+
         // on even numbered rounds
         if (this.getRoundNum() % 2 == 0) {
           // try to find the best number of velocities to track, which will be between 1 and 100
@@ -109,6 +131,11 @@ public class RedShift extends AdvancedRobot {
     execute();
   }
 
+  /**
+   * Whenever this robot scans a robot, it will move and aim/fire.
+   *
+   * @param event information about the scanned robot.
+   */
   @Override
   public void onScannedRobot(ScannedRobotEvent event) {
     // infinity lock
@@ -137,10 +164,10 @@ public class RedShift extends AdvancedRobot {
    * @param event ScannedRobotEvent
    */
   private void setTurn(ScannedRobotEvent event) {
-    // if it is a 1-v-1 and the enemy just fired and their accuracy is
+    // if it is a 1-v-1 and the target just fired
     if (!RedShift.IS_MELEE && this.targetInfo.justFired()) {
       out.println("enemy fired");
-      if (this.targetInfo.getAccuracy() > this.getAccuracy()) {
+      if (this.dodge) {
         this.direction *= -1;
       }
     }
@@ -260,7 +287,7 @@ public class RedShift extends AdvancedRobot {
    */
   @Override
   public void onHitWall(HitWallEvent event) {
-    out.println("hit wall");
+//    out.println("hit wall");
     this.direction *= -1;
   }
 
@@ -271,8 +298,8 @@ public class RedShift extends AdvancedRobot {
    */
   @Override
   public void onHitRobot(HitRobotEvent event) {
-    out.println("hit robot");
-//    this.direction *= -1;
+//    out.println("hit robot");
+    this.direction *= -1;
   }
 
   @Override
@@ -299,9 +326,16 @@ public class RedShift extends AdvancedRobot {
 
   @Override
   public void onRoundEnded(RoundEndedEvent event) {
-    out.printf("accuracy: %f%n", this.getAccuracy());
-    out.printf("enemy accuracy: %f%n", this.targetInfo.getAccuracy());
+    out.printf("my accuracy:              %f%n", this.getAccuracy());
+    out.printf("estimated enemy accuracy: %f%n", this.targetInfo.getAccuracy());
     RedShift.addAccuracy(NUM_VELOCITIES, this.getAccuracy());
+
+    if (this.dodge) {
+      RedShift.setEnemyAccuracyWithDodge(this.targetInfo.getAccuracy());
+    }
+    else {
+      RedShift.setEnemyAccuracyWithoutDodge(this.targetInfo.getAccuracy());
+    }
   }
 
   /**
@@ -422,5 +456,23 @@ public class RedShift extends AdvancedRobot {
    */
   public static double getMaxFiringDistance() {
     return MAX_FIRING_DISTANCE;
+  }
+
+  /**
+   * Sets the value of enemyAccuracyWithDodge to the maximum of the current value and the
+   * specified new accuracy.
+   * @param accuracy new accuracy
+   */
+  public static void setEnemyAccuracyWithDodge(double accuracy) {
+    RedShift.enemyAccuracyWithDodge = Math.max(RedShift.enemyAccuracyWithDodge, accuracy);
+  }
+
+  /**
+   * Sets the value of enemyAccuracyWithoutDodge to the maximum of the current value and the
+   * specified new accuracy.
+   * @param accuracy new accuracy
+   */
+  public static void setEnemyAccuracyWithoutDodge(double accuracy) {
+    RedShift.enemyAccuracyWithoutDodge = Math.max(RedShift.enemyAccuracyWithoutDodge, accuracy);
   }
 }

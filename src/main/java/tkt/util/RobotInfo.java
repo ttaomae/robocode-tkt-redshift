@@ -18,8 +18,8 @@ public class RobotInfo {
   private double velocity;
   private double absoluteBearing;
   private boolean justFired;
-  private double shotsFired;
-  private double shotsHit;
+  private int shotsFired;
+  private int shotsHit;
 
   /**
    * Constructs a new RobotInfo which contains information taken from the specified
@@ -59,7 +59,7 @@ public class RobotInfo {
     this.y = position.getY();
 
     double energyChange = previousEnergy - this.energy;
-    if (energyChange > 0.1 && energyChange < 3.0) {
+    if (energyChange >= 0.1 && energyChange <= 3.0) {
       this.justFired = true;
       this.shotsFired++;
     }
@@ -153,5 +153,13 @@ public class RobotInfo {
    */
   public void addShotHit() {
     this.shotsHit++;
+  }
+
+  /**
+   * Returns the number of shots fired.
+   * @return the number of shots fired
+   */
+  public int getShotsFired() {
+    return this.shotsFired;
   }
 }
