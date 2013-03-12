@@ -26,6 +26,8 @@ import tkt.util.RobotInfo;
  * @author Todd Taomae
  */
 public class RedShift extends AdvancedRobot {
+  /** Print debug information if this value is true. */
+  private static final boolean DEBUG = false;
   /** Preferred distance from the enemy. */
   private static final double PREFERRED_DISTANCE = 200.0;
   /** Plus/minus distance from the preferred distance. */
@@ -83,7 +85,9 @@ public class RedShift extends AdvancedRobot {
     // determine how many velocities to keep track of and whether or not to dodge
     // if it is a melee battle
     if (RedShift.IS_MELEE) {
-      out.println("is melee");
+      if (RedShift.DEBUG) {
+        out.println("is melee");
+      }
       // do not keep track of multiple velocities because you cannot guarantee that you will
       // always scan the same robot.
       RedShift.setNumVelocities(1);
@@ -123,7 +127,9 @@ public class RedShift extends AdvancedRobot {
         }
       }
 
-      out.printf("velocities tracked: %d%n", NUM_VELOCITIES);
+      if (RedShift.DEBUG) {
+        out.printf("velocities tracked: %d%n", NUM_VELOCITIES);
+      }
       this.velocities = new BoundedQueue<Double>(NUM_VELOCITIES);
     }
 
@@ -166,7 +172,9 @@ public class RedShift extends AdvancedRobot {
   private void setTurn(ScannedRobotEvent event) {
     // if it is a 1-v-1 and the target just fired
     if (!RedShift.IS_MELEE && this.targetInfo.justFired()) {
-      out.println("enemy fired");
+      if (RedShift.DEBUG) {
+        out.println("enemy fired");
+      }
       if (this.dodge) {
         this.direction *= -1;
       }
@@ -326,8 +334,11 @@ public class RedShift extends AdvancedRobot {
 
   @Override
   public void onRoundEnded(RoundEndedEvent event) {
-    out.printf("my accuracy:              %f%n", this.getAccuracy());
-    out.printf("estimated enemy accuracy: %f%n", this.targetInfo.getAccuracy());
+
+    if (RedShift.DEBUG) {
+      out.printf("my accuracy:              %f%n", this.getAccuracy());
+      out.printf("estimated enemy accuracy: %f%n", this.targetInfo.getAccuracy());
+    }
     RedShift.addAccuracy(NUM_VELOCITIES, this.getAccuracy());
 
     if (this.dodge) {
@@ -356,14 +367,17 @@ public class RedShift extends AdvancedRobot {
       return;
     }
 
-    // draw preferred distance
-    drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
-        PREFERRED_DISTANCE - DISTANCE_BUFFER, Color.BLUE, g);
-    drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
-        PREFERRED_DISTANCE + DISTANCE_BUFFER, Color.BLUE, g);
+    if (RedShift.DEBUG) {
+      // draw preferred distance
+      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
+          PREFERRED_DISTANCE - DISTANCE_BUFFER, Color.BLUE, g);
+      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
+          PREFERRED_DISTANCE + DISTANCE_BUFFER, Color.BLUE, g);
 
-    // draw max firing distance
-    drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), MAX_FIRING_DISTANCE, Color.RED, g);
+      // draw max firing distance
+      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
+          MAX_FIRING_DISTANCE, Color.RED, g);
+    }
   }
 
   /**
