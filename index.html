@@ -37,19 +37,19 @@
 
 <h2>About RedShift</h2>
 
-<p>RedShift is a <a href="http://robocode.sourceforge.net/">Robocode</a> AdvancedRobot. It is primarily designed for one one one battles.The following outlines its basic strategy.</p>
+<p>RedShift is a <a href="http://robocode.sourceforge.net/">Robocode</a> AdvancedRobot which attempts to adapt its strategy based on its performance. It is primarily designed for one-vs-one battles.The following outlines its basic strategy.</p>
 
 <h3>Movement</h3>
 
-<p>RedShift attempts to always move and always stay perpendicular to the enemy. This strategy works well against <a href="http://robocode.sourceforge.net/">head-on targeting</a>. In addition, RedShift will also try to move closer to the enemy if it is too far or move farther if it is too close. Being closer to the target makes it easier to hit the target. However, this also means that the enemy will be able to hit you easier. The distance was chosen to try to balance these two factors.</p>
+<p>RedShift attempts to always move and always stay perpendicular to the enemy. In addition, RedShift will also try to move closer to the enemy if it is too far or move farther if it is too close. Being closer to the target makes it easier to hit the target. However, this also means that the enemy will be able to hit you more easily. The distance was chosen to try to balance these two factors. Redshift attempts two variations of this strategy. One strategy is to constantly move in the same direction; this strategy works well against <a href="http://robocode.sourceforge.net/">head-on targeting</a>. The alternative is to change direction each time it detects that the enemy has fired, which works better against <a href="http://robowiki.net/wiki/Linear_Targeting">linear targeting</a>. Between each round, Redshift will try to choose the better of these two strategies.</p>
 
 <h3>Targeting and Firing</h3>
 
-<p>RedShift uses <a href="http://robowiki.net/wiki/Linear_Targeting">linear targeting</a>. Linear targeting assumes that the target will continue to move in the same direction with the same velocity and aims where the robot would be by the time your bullet reaches them. Since not all robots will follow this behavior, I keep track of multiple past velocities and use a <a href="http://en.wikipedia.org/wiki/Moving_average#Weighted_moving_average">weighted moving average</a> of these velocities rather than just the most recently scanned velocity. RedShift will fire at every opportunity that it can as long as it is not too far from the enemy. The firing power is inversely proportional to the distance from the target. As the distance from the target increases, the power decreases.</p>
+<p>RedShift uses linear targeting. Linear targeting assumes that the target will continue to move in the same direction with the same velocity and aims where the robot would be by the time your bullet reaches them. Since not all robots will follow this behavior, I keep track of multiple past velocities and use a <a href="http://en.wikipedia.org/wiki/Moving_average#Weighted_moving_average">weighted moving average</a> of these velocities rather than just the most recently scanned velocity. The number of tracked velocities changes between rounds as Redshift tries to find the best strategy. RedShift will fire at every opportunity that it can as long as it is not too far from the enemy. The firing power is inversely proportional to the distance from the target. As the distance from the target increases, the power decreases.</p>
 
 <h3>Vulnerabilities</h3>
 
-<p>Currently, RedShift is vulnerable to other linear targeting robots since it constantly moves in approximately the same direction. It also performs relatively poorly in melee battles. This is because much of the strategy assumes that there is only one other robot and it makes no adjustments when there are more robots.</p>
+<p>Currently, RedShift is vulnerable to robots with targeting that is more advanced than head-on or linear targeting. It also performs relatively poorly in melee battles. This is because much of the strategy assumes that there is only one other robot and it makes few adjustments when there are more robots.</p>
 
 <h2>Additional Info</h2>
 
