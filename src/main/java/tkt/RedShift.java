@@ -15,7 +15,7 @@ import robocode.HitRobotEvent;
 import robocode.HitWallEvent;
 import robocode.RoundEndedEvent;
 import robocode.ScannedRobotEvent;
-import tkt.util.AdvancedRobotUtility;
+import robocode.util.Utils;
 import tkt.util.BoundedQueue;
 import tkt.util.MathUtility;
 import tkt.util.RobotInfo;
@@ -57,9 +57,6 @@ public class RedShift extends AdvancedRobot {
   private boolean dodge = false;
   /** Random number generator. */
   private Random rng = new Random();
-
-  /** Helper for this robot. */
-  private AdvancedRobotUtility roboUtil = new AdvancedRobotUtility(this);
 
   /**
    * On the first round, check if this is a melee battle. Sets up the necessary information
@@ -174,7 +171,9 @@ public class RedShift extends AdvancedRobot {
       turnHeading += this.direction * (Math.PI / 8);
     }
 
-    roboUtil.setTurnToHeadingRadians(turnHeading);
+    double turnAmount = turnHeading - this.getHeadingRadians();
+    turnAmount = Utils.normalRelativeAngle(turnAmount);
+    setTurnRight(turnAmount);
   }
 
   /**
@@ -237,7 +236,10 @@ public class RedShift extends AdvancedRobot {
 
 
     double gunHeading = MathUtility.getDirectionRadians(myX, myY, predictedX, predictedY);
-    roboUtil.setTurnGunToHeadingRadians(gunHeading);
+
+    double turnAmount = gunHeading - this.getHeadingRadians();
+    turnAmount = Utils.normalRelativeAngle(turnAmount);
+    setTurnGunRight(turnAmount);
 
     // if it is a melee battle, always fire
     // otherwise only fire if you are within the max firing distance
