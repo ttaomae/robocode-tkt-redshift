@@ -10,16 +10,20 @@ import robocode.ScannedRobotEvent;
  * @author Todd Taomae
  */
 public class RobotInfo {
-  private final String name;
-  private double energy;
-  private double x;
-  private double y;
-  private double heading;
-  private double velocity;
-  private double absoluteBearing;
-  private boolean justFired;
-  private int shotsFired;
-  private int shotsHit;
+  /** Current energy of the robot. */
+  public double energy;
+  /** Current x-coordinate of the robot. */
+  public double x;
+  /** Current y-coordinate of the robot. */
+  public double y;
+  /** Current absoluteBearing of the robot. */
+  public double absoluteBearing;
+  /** True if the robot has just fired. */
+  public boolean justFired;
+  /** Number of shots fired by the robot. */
+  public int shotsFired;
+  /** Number of shots fires that sucessfully hit. */
+  public int shotsHit;
 
   /**
    * Constructs a new RobotInfo which contains information taken from the specified
@@ -28,8 +32,6 @@ public class RobotInfo {
    * @param event describes scanned robot
    */
   public RobotInfo(Robot robot, ScannedRobotEvent event) {
-    this.name = event.getName();
-
     this.energy = -1.0; // initialize energy to an invalid value
     this.updateInfo(robot, event);
   }
@@ -41,13 +43,8 @@ public class RobotInfo {
    * @throws IllegalArgumentException if the event describes a different robot
    */
   public final void updateInfo(Robot robot, ScannedRobotEvent event) {
-    if (!event.getName().equals(this.name)) {
-      throw new IllegalArgumentException("event must describe the same robot");
-    }
     double previousEnergy = this.energy;
     this.energy = event.getEnergy();
-    this.heading = event.getHeadingRadians();
-    this.velocity = event.getVelocity();
 
     // set position
     this.absoluteBearing = robot.getHeading() + event.getBearing();
@@ -70,97 +67,10 @@ public class RobotInfo {
   }
 
   /**
-   * Returns the name of the robot.
-   * @return the name of the robot
-   */
-  public String getRobotName() {
-    return name;
-  }
-
-  /**
-   * Returns the energy of the robot.
-   * @return the energy of the robot
-   */
-  public double getEnergy() {
-    return energy;
-  }
-
-  /**
-   * Returns the location of the robot.
-   * @return the location of the robot.
-   */
-  public Point2D.Double getLocation() {
-    return new Point2D.Double(this.x, this.y);
-  }
-
-  /**
-   * Returns the x-coordinate of the robot.
-   * @return the x-coordinate of the robot
-   */
-  public double getX() {
-    return this.x;
-  }
-
-  /**
-   * Returns the y-coordinate of the robot.
-   * @return the y-coordinate of the robot
-   */
-  public double getY() {
-    return this.y;
-  }
-
-  /**
-   * Returns the heading of the robot.
-   * @return the heading of the robot
-   */
-  public double getHeading() {
-    return heading;
-  }
-
-  /**
-   * Returns the velocity of the robot.
-   * @return the velocity of the robot.
-   */
-  public double getVelocity() {
-    return velocity;
-  }
-
-  /**
-   * Returns the absolute bearing to the robot.
-   * @return the absolute bearing to the robot
-   */
-  public double getAbsoluteBearing() {
-    return this.absoluteBearing;
-  }
-
-  /**
-   * Returns whether or not the robot just fired.
-   * @return whether or not the robot just fired
-   */
-  public boolean justFired() {
-    return justFired;
-  }
-
-  /**
    * Returns the accuracy of the robot.
    * @return the accuracy of the robot
    */
   public double getAccuracy() {
     return (double)this.shotsHit / (double)(this.shotsFired + this.shotsHit);
-  }
-
-  /**
-   * Adds one to the number of shots hit.
-   */
-  public void addShotHit() {
-    this.shotsHit++;
-  }
-
-  /**
-   * Returns the number of shots fired.
-   * @return the number of shots fired
-   */
-  public int getShotsFired() {
-    return this.shotsFired;
   }
 }

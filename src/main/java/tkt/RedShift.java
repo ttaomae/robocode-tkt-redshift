@@ -153,7 +153,7 @@ public class RedShift extends AdvancedRobot {
    */
   private void setTurn(ScannedRobotEvent event) {
     // if it is a 1-v-1 and the target just fired
-    if (this.targetInfo.justFired()) {
+    if (this.targetInfo.justFired) {
       if (RedShift.DEBUG) {
         out.println("enemy fired");
       }
@@ -163,7 +163,7 @@ public class RedShift extends AdvancedRobot {
     }
 
     // perpendicular to target
-    double turnHeading = this.targetInfo.getAbsoluteBearing() + (Math.PI / 2);
+    double turnHeading = this.targetInfo.absoluteBearing + (Math.PI / 2);
 
     // if you are too far from scanned robot
     if (event.getDistance() > PREFERRED_DISTANCE + DISTANCE_BUFFER) {
@@ -196,9 +196,9 @@ public class RedShift extends AdvancedRobot {
 
     // get enemy information
     // _____E
-    // | /
-    // | /
-    // | /
+    // |    /
+    // |   /
+    // |  /
     // |a/
     // |/
     // R
@@ -206,14 +206,14 @@ public class RedShift extends AdvancedRobot {
     double enemyHeading = event.getHeadingRadians();
     double enemyVelocity = this.getAverageEnemyVelocity();
 
-    double predictedX = this.targetInfo.getX();
-    double predictedY = this.targetInfo.getY();
+    double predictedX = this.targetInfo.x;
+    double predictedY = this.targetInfo.y;
 
     //
     // _____F
-    // | /
-    // | /
-    // | / h
+    // |    /
+    // |   /
+    // |  / h
     // |a/
     // |/
     // E
@@ -301,7 +301,7 @@ public class RedShift extends AdvancedRobot {
 
   @Override
   public void onHitByBullet(HitByBulletEvent event) {
-    this.targetInfo.addShotHit();
+    this.targetInfo.shotsHit++;
   }
 
   @Override
@@ -364,13 +364,13 @@ public class RedShift extends AdvancedRobot {
 
     if (RedShift.DEBUG) {
       // draw preferred distance
-      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), PREFERRED_DISTANCE
+      drawCircle(this.targetInfo.x, this.targetInfo.y, PREFERRED_DISTANCE
           - DISTANCE_BUFFER, Color.BLUE, g);
-      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), PREFERRED_DISTANCE
+      drawCircle(this.targetInfo.x, this.targetInfo.y, PREFERRED_DISTANCE
           + DISTANCE_BUFFER, Color.BLUE, g);
 
       // draw max firing distance
-      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), MAX_FIRING_DISTANCE, Color.RED, g);
+      drawCircle(this.targetInfo.x, this.targetInfo.y, MAX_FIRING_DISTANCE, Color.RED, g);
     }
   }
 
