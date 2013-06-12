@@ -10,7 +10,6 @@ import robocode.control.snapshot.IBulletSnapshot;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.testing.RobotTestBed;
 import tkt.RedShift;
-import tkt.util.MathUtility;
 
 /**
  * Tests that RedShift is within at the preferred distance from the enemy robot
@@ -75,8 +74,9 @@ public class TestRedShiftFiring extends RobotTestBed {
     IRobotSnapshot robotB = robots[1];
 
     // get distance between two robots
-    double distance = MathUtility.getDistance(robotA.getX(), robotA.getY(),
-                                              robotB.getX(), robotB.getY());
+    double xDiff = robotB.getX() - robotA.getX();
+    double yDiff = robotB.getY() - robotA.getY();
+    double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
     // SittingDuck does not fire, so all bullets belong to RedShift
 

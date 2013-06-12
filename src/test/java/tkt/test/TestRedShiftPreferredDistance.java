@@ -6,7 +6,6 @@ import robocode.control.events.TurnEndedEvent;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.testing.RobotTestBed;
 import tkt.RedShift;
-import tkt.util.MathUtility;
 
 /**
  * Tests that RedShift is within at the preferred distance from the enemy robot
@@ -62,8 +61,9 @@ public class TestRedShiftPreferredDistance extends RobotTestBed {
     IRobotSnapshot robotB = robots[1];
 
     // get distance between two robots
-    double distance = MathUtility.getDistance(robotA.getX(), robotA.getY(),
-                                              robotB.getX(), robotB.getY());
+    double xDiff = robotB.getX() - robotA.getX();
+    double yDiff = robotB.getY() - robotA.getY();
+    double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
     // if robots are within the preferred distance
     if (Math.abs(RedShift.PREFERRED_DISTANCE - distance) < RedShift.DISTANCE_BUFFER) {

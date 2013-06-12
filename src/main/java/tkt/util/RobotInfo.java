@@ -50,10 +50,11 @@ public class RobotInfo {
     this.velocity = event.getVelocity();
 
     // set position
-    this.absoluteBearing = MathUtility.getAbsoluteBearing(robot.getHeading(), event.getBearing());
+    this.absoluteBearing = robot.getHeading() + event.getBearing();
     this.absoluteBearing = Math.toRadians(this.absoluteBearing);
-    Point2D.Double position = MathUtility.getTargetPoint(robot.getX(), robot.getY(),
-       this.absoluteBearing, event.getDistance());
+    double targetX = robot.getX() + (Math.sin(this.absoluteBearing) * event.getDistance());
+    double targetY = robot.getY() + (Math.cos(this.absoluteBearing) * event.getDistance());
+    Point2D.Double position = new Point2D.Double(targetX, targetY);
 
     this.x = position.getX();
     this.y = position.getY();

@@ -17,7 +17,6 @@ import robocode.RoundEndedEvent;
 import robocode.ScannedRobotEvent;
 import robocode.util.Utils;
 import tkt.util.BoundedQueue;
-import tkt.util.MathUtility;
 import tkt.util.RobotInfo;
 
 /**
@@ -173,7 +172,7 @@ public class RedShift extends AdvancedRobot {
 
     double turnAmount = turnHeading - this.getHeadingRadians();
     turnAmount = Utils.normalRelativeAngle(turnAmount);
-    setTurnRight(turnAmount);
+    setTurnRightRadians(turnAmount);
   }
 
   /**
@@ -235,11 +234,13 @@ public class RedShift extends AdvancedRobot {
     } while (bulletTravelDistance < Point2D.Double.distance(myX, myY, predictedX, predictedY));
 
 
-    double gunHeading = MathUtility.getDirectionRadians(myX, myY, predictedX, predictedY);
+    double xDiff = predictedX - myX;
+    double yDiff = predictedY - myY;
+    double gunHeading = Math.atan2(xDiff, yDiff);
 
-    double turnAmount = gunHeading - this.getHeadingRadians();
+    double turnAmount = gunHeading - this.getGunHeadingRadians();
     turnAmount = Utils.normalRelativeAngle(turnAmount);
-    setTurnGunRight(turnAmount);
+    setTurnGunRightRadians(turnAmount);
 
     // if it is a melee battle, always fire
     // otherwise only fire if you are within the max firing distance
