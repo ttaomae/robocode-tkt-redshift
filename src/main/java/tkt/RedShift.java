@@ -21,7 +21,7 @@ import tkt.util.RobotInfo;
 
 /**
  * AdvancedRobot that circles and tracks the enemy.
- *
+ * 
  * @author Todd Taomae
  */
 public class RedShift extends AdvancedRobot {
@@ -58,15 +58,15 @@ public class RedShift extends AdvancedRobot {
   private Random rng = new Random();
 
   /**
-   * On the first round, check if this is a melee battle. Sets up the necessary information
-   * at the start of each round.
+   * On the first round, check if this is a melee battle. Sets up the necessary information at the
+   * start of each round.
    */
   @Override
   public void run() {
     setBodyColor(new Color(64, 0, 0));
     setGunColor(new Color(128, 0, 0));
     setRadarColor(new Color(172, 0, 0));
-    setBulletColor(new Color(255, 0,0));
+    setBulletColor(new Color(255, 0, 0));
     setAdjustGunForRobotTurn(true);
     setAdjustRadarForGunTurn(true);
     setAdjustRadarForRobotTurn(true);
@@ -115,7 +115,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Whenever this robot scans a robot, it will move and aim/fire.
-   *
+   * 
    * @param event information about the scanned robot.
    */
   @Override
@@ -142,7 +142,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Turns perpendicular to the scanned robot. Tries to move to a certain distance away.
-   *
+   * 
    * @param event ScannedRobotEvent
    */
   private void setTurn(ScannedRobotEvent event) {
@@ -177,7 +177,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Uses linear targeting to track the scanned robot.
-   *
+   * 
    * @param event ScannedRobotEvent
    */
   private void setAimAndFire(ScannedRobotEvent event) {
@@ -189,10 +189,10 @@ public class RedShift extends AdvancedRobot {
     double myY = getY();
 
     // get enemy information
-    //  _____E
-    // |    /
-    // |   /
-    // |  /
+    // _____E
+    // | /
+    // | /
+    // | /
     // |a/
     // |/
     // R
@@ -204,10 +204,10 @@ public class RedShift extends AdvancedRobot {
     double predictedY = this.targetInfo.getY();
 
     //
-    //  _____F
-    // |    /
-    // |   /
-    // |  / h
+    // _____F
+    // | /
+    // | /
+    // | / h
     // |a/
     // |/
     // E
@@ -231,8 +231,8 @@ public class RedShift extends AdvancedRobot {
       bulletTravelDistance += bulletVelocity;
 
       // while bullet has not reached predicted location
-    } while (bulletTravelDistance < Point2D.Double.distance(myX, myY, predictedX, predictedY));
-
+    }
+    while (bulletTravelDistance < Point2D.Double.distance(myX, myY, predictedX, predictedY));
 
     double xDiff = predictedX - myX;
     double yDiff = predictedY - myY;
@@ -273,23 +273,23 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Change directions if you hit a wall.
-   *
+   * 
    * @param event HitWallEvent
    */
   @Override
   public void onHitWall(HitWallEvent event) {
-//    out.println("hit wall");
+    // out.println("hit wall");
     this.direction *= -1;
   }
 
   /**
    * Change directions if you hit a robot.
-   *
+   * 
    * @param event HitWallEvent
    */
   @Override
   public void onHitRobot(HitRobotEvent event) {
-//    out.println("hit robot");
+    // out.println("hit robot");
     this.direction *= -1;
   }
 
@@ -320,13 +320,20 @@ public class RedShift extends AdvancedRobot {
       out.printf("my accuracy:              %f%n", this.getAccuracy());
       out.printf("estimated enemy accuracy: %f%n", this.targetInfo.getAccuracy());
     }
-    RedShift.addAccuracy(NUM_VELOCITIES, this.getAccuracy());
 
+    // if the key is not in the map
+    // or if the key existing value is greater than the new value
+    if (!RedShift.accuracies.containsKey(NUM_VELOCITIES)
+        || RedShift.accuracies.get(NUM_VELOCITIES) > this.getAccuracy()) {
+      RedShift.accuracies.put(NUM_VELOCITIES, this.getAccuracy());
+    }
     if (this.dodge) {
-      RedShift.setEnemyAccuracyWithDodge(this.targetInfo.getAccuracy());
+      RedShift.enemyAccuracyWithDodge =
+          Math.max(RedShift.enemyAccuracyWithDodge, this.targetInfo.getAccuracy());
     }
     else {
-      RedShift.setEnemyAccuracyWithoutDodge(this.targetInfo.getAccuracy());
+      RedShift.enemyAccuracyWithoutDodge =
+          Math.max(RedShift.enemyAccuracyWithDodge, this.targetInfo.getAccuracy());
     }
   }
 
@@ -335,11 +342,12 @@ public class RedShift extends AdvancedRobot {
    * @return this robots accuracy
    */
   public double getAccuracy() {
-    return (double)this.hits / (double)(this.hits + this.misses);
+    return (double) this.hits / (double) (this.hits + this.misses);
   }
+  
   /**
    * Draws debugging information.
-   *
+   * 
    * @param g graphics
    */
   @Override
@@ -350,20 +358,19 @@ public class RedShift extends AdvancedRobot {
 
     if (RedShift.DEBUG) {
       // draw preferred distance
-      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
-          PREFERRED_DISTANCE - DISTANCE_BUFFER, Color.BLUE, g);
-      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
-          PREFERRED_DISTANCE + DISTANCE_BUFFER, Color.BLUE, g);
+      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), PREFERRED_DISTANCE
+          - DISTANCE_BUFFER, Color.BLUE, g);
+      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), PREFERRED_DISTANCE
+          + DISTANCE_BUFFER, Color.BLUE, g);
 
       // draw max firing distance
-      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(),
-          MAX_FIRING_DISTANCE, Color.RED, g);
+      drawCircle(this.targetInfo.getX(), this.targetInfo.getY(), MAX_FIRING_DISTANCE, Color.RED, g);
     }
   }
 
   /**
    * Helper method to draw a circle.
-   *
+   * 
    * @param x x-coordinate of the center
    * @param y y-coordinate of the center
    * @param r radius
@@ -374,24 +381,9 @@ public class RedShift extends AdvancedRobot {
     Color original = g.getColor();
 
     g.setColor(c);
-    g.drawOval((int)(x - r), (int)(y - r), (int)(2 * r), (int)(2 * r));
+    g.drawOval((int) (x - r), (int) (y - r), (int) (2 * r), (int) (2 * r));
 
     g.setColor(original);
-  }
-
-  /**
-   * Adds a new (# velocities, accuracy) pair to the map of accuracies.
-   * If the key already exists, only add the new value if it is worse than the existing value.
-   * This will ensure that you only keep track of the worst performance.
-   * @param num number of velocities used
-   * @param acc accuracy
-   */
-  private static void addAccuracy(int num, double acc) {
-    // if the key is not in the map
-    // or if the key existing value is greater than the new value
-    if (!RedShift.accuracies.containsKey(num) || RedShift.accuracies.get(num) > acc) {
-      RedShift.accuracies.put(num, acc);
-    }
   }
 
   /**
@@ -402,33 +394,15 @@ public class RedShift extends AdvancedRobot {
     // get weighted average of all past # velocities
     // the weight is equal to the accuracy
     double result = 0;
-    double totalWeight = Double.MIN_VALUE;  // use small value to prevent divide by zero
+    double totalWeight = Double.MIN_VALUE; // use small value to prevent divide by zero
     // iterate through each entry
     for (Map.Entry<Integer, Double> entry : RedShift.accuracies.entrySet()) {
       double weight = entry.getValue() * entry.getValue();
-      result += weight * (double)entry.getKey();
+      result += weight * (double) entry.getKey();
       totalWeight += weight;
     }
 
     result /= totalWeight;
-    return Math.max(1, (int)result);
-  }
-
-  /**
-   * Sets the value of enemyAccuracyWithDodge to the maximum of the current value and the
-   * specified new accuracy.
-   * @param accuracy new accuracy
-   */
-  public static void setEnemyAccuracyWithDodge(double accuracy) {
-    RedShift.enemyAccuracyWithDodge = Math.max(RedShift.enemyAccuracyWithDodge, accuracy);
-  }
-
-  /**
-   * Sets the value of enemyAccuracyWithoutDodge to the maximum of the current value and the
-   * specified new accuracy.
-   * @param accuracy new accuracy
-   */
-  public static void setEnemyAccuracyWithoutDodge(double accuracy) {
-    RedShift.enemyAccuracyWithoutDodge = Math.max(RedShift.enemyAccuracyWithoutDodge, accuracy);
+    return Math.max(1, (int) result);
   }
 }
