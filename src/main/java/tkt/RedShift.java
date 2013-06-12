@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import robocode.AdvancedRobot;
@@ -16,12 +18,11 @@ import robocode.HitWallEvent;
 import robocode.RoundEndedEvent;
 import robocode.ScannedRobotEvent;
 import robocode.util.Utils;
-import tkt.util.BoundedQueue;
 import tkt.util.RobotInfo;
 
 /**
  * AdvancedRobot that circles and tracks the enemy.
- * 
+ *
  * @author Todd Taomae
  */
 public class RedShift extends AdvancedRobot {
@@ -47,7 +48,7 @@ public class RedShift extends AdvancedRobot {
   /** Information about your target. */
   private RobotInfo targetInfo = null;
   /** Most recent history of velocities of the scanned robot. */
-  private BoundedQueue<Double> velocities = new BoundedQueue<Double>(NUM_VELOCITIES);
+  private List<Double> velocities = new LinkedList<Double>();
   /** Number of bullets that hit an enemy. */
   private int hits = 0;
   /** Number of bullets that missed an enemy. */
@@ -106,7 +107,6 @@ public class RedShift extends AdvancedRobot {
       if (RedShift.DEBUG) {
         out.printf("velocities tracked: %d%n", NUM_VELOCITIES);
       }
-      this.velocities = new BoundedQueue<Double>(NUM_VELOCITIES);
     }
 
     setTurnRadarRightRadians(Double.POSITIVE_INFINITY);
@@ -115,7 +115,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Whenever this robot scans a robot, it will move and aim/fire.
-   * 
+   *
    * @param event information about the scanned robot.
    */
   @Override
@@ -132,7 +132,13 @@ public class RedShift extends AdvancedRobot {
       this.targetInfo.updateInfo(this, event);
     }
 
-    this.velocities.add(event.getVelocity());
+    // add velocity to list
+    // add to front of list
+    this.velocities.add(0, event.getVelocity());
+    // remove from end if list is full
+    if (this.velocities.size() > NUM_VELOCITIES) {
+      this.velocities.remove(this.velocities.size() - 1);
+    }
 
     setTurn(event);
     setAimAndFire(event);
@@ -142,7 +148,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Turns perpendicular to the scanned robot. Tries to move to a certain distance away.
-   * 
+   *
    * @param event ScannedRobotEvent
    */
   private void setTurn(ScannedRobotEvent event) {
@@ -177,7 +183,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Uses linear targeting to track the scanned robot.
-   * 
+   *
    * @param event ScannedRobotEvent
    */
   private void setAimAndFire(ScannedRobotEvent event) {
@@ -273,7 +279,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Change directions if you hit a wall.
-   * 
+   *
    * @param event HitWallEvent
    */
   @Override
@@ -284,7 +290,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Change directions if you hit a robot.
-   * 
+   *
    * @param event HitWallEvent
    */
   @Override
@@ -344,10 +350,10 @@ public class RedShift extends AdvancedRobot {
   public double getAccuracy() {
     return (double) this.hits / (double) (this.hits + this.misses);
   }
-  
+
   /**
    * Draws debugging information.
-   * 
+   *
    * @param g graphics
    */
   @Override
@@ -370,7 +376,7 @@ public class RedShift extends AdvancedRobot {
 
   /**
    * Helper method to draw a circle.
-   * 
+   *
    * @param x x-coordinate of the center
    * @param y y-coordinate of the center
    * @param r radius
