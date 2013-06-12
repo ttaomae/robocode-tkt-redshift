@@ -36,8 +36,6 @@ public class RedShift extends AdvancedRobot {
   private static final double MAX_FIRING_DISTANCE = 400.0;
   /** Number of velocities being tracked. */
   private static int NUM_VELOCITIES = 1;
-  /** True if this battle is a melee battle (more than two robots). */
-  private static boolean IS_MELEE = false;
   /** Maps the number of velocities tracked to an accuracy. */
   private static Map<Integer, Double> accuracies = new HashMap<Integer, Double>();
   /** The best enemy accuracy with dodging. */
@@ -77,54 +75,36 @@ public class RedShift extends AdvancedRobot {
     setAdjustRadarForGunTurn(true);
     setAdjustRadarForRobotTurn(true);
 
-    // check on the first round
-    if (this.getRoundNum() == 0) {
-      RedShift.setMelee(this.getOthers() > 1);
-    }
-
     // determine how many velocities to keep track of and whether or not to dodge
-    // if it is a melee battle
-    if (RedShift.IS_MELEE) {
-      if (RedShift.DEBUG) {
-        out.println("is melee");
-      }
-      // do not keep track of multiple velocities because you cannot guarantee that you will
-      // always scan the same robot.
+    // on the first round
+    if (this.getRoundNum() == 0) {
+      // track 1 velocity
       RedShift.setNumVelocities(1);
+      // don't dodge
+      this.dodge = false;
     }
-
-    // if it is 1-vs-1
+    // on the second round
+    else if (this.getRoundNum() == 1) {
+      // track 50 velocities
+      RedShift.setNumVelocities(50);
+      // dodge
+      this.dodge = true;
+    }
     else {
-      // on the first round
-      if (this.getRoundNum() == 0) {
-        // track 1 velocity
-        RedShift.setNumVelocities(1);
-        // don't dodge
-        this.dodge = false;
+      // dodge if it is the better option
+      this.dodge = RedShift.enemyAccuracyWithDodge < RedShift.enemyAccuracyWithoutDodge;
+
+      // on even numbered rounds
+      if (this.getRoundNum() % 2 == 0) {
+        // try to find the best number of velocities to track, which will be between 1 and 100
+        RedShift.setNumVelocities(RedShift.getBestNumVelocities());
       }
-      // on the second round
-      else if (this.getRoundNum() == 1) {
-        // track 50 velocities
-        RedShift.setNumVelocities(50);
-        // dodge
-        this.dodge = true;
-      }
+      // on odd numbered rounds
       else {
-        // dodge if it is the better option
-        this.dodge = RedShift.enemyAccuracyWithDodge < RedShift.enemyAccuracyWithoutDodge;
+        // select a random number close to the best option
+        int num = RedShift.getBestNumVelocities() + (this.rng.nextInt(21) - 10);
+        RedShift.setNumVelocities(Math.max(1, num));
 
-        // on even numbered rounds
-        if (this.getRoundNum() % 2 == 0) {
-          // try to find the best number of velocities to track, which will be between 1 and 100
-          RedShift.setNumVelocities(RedShift.getBestNumVelocities());
-        }
-        // on odd numbered rounds
-        else {
-          // select a random number close to the best option
-          int num = RedShift.getBestNumVelocities() + (this.rng.nextInt(21) - 10);
-          RedShift.setNumVelocities(Math.max(1, num));
-
-        }
       }
 
       if (RedShift.DEBUG) {
@@ -149,7 +129,7 @@ public class RedShift extends AdvancedRobot {
     this.setTurnRadarLeftRadians(getRadarTurnRemainingRadians());
 
     // if it is a melee battle always assume it is a new robot
-    if (RedShift.IS_MELEE || this.targetInfo == null) {
+    if (this.targetInfo == null) {
       this.targetInfo = new RobotInfo(this, event);
     }
     else {
@@ -171,7 +151,7 @@ public class RedShift extends AdvancedRobot {
    */
   private void setTurn(ScannedRobotEvent event) {
     // if it is a 1-v-1 and the target just fired
-    if (!RedShift.IS_MELEE && this.targetInfo.justFired()) {
+    if (this.targetInfo.justFired()) {
       if (RedShift.DEBUG) {
         out.println("enemy fired");
       }
@@ -261,7 +241,7 @@ public class RedShift extends AdvancedRobot {
 
     // if it is a melee battle, always fire
     // otherwise only fire if you are within the max firing distance
-    if (RedShift.IS_MELEE || event.getDistance() <= MAX_FIRING_DISTANCE) {
+    if (event.getDistance() <= MAX_FIRING_DISTANCE) {
       setFire(bulletPower);
     }
   }
@@ -283,7 +263,7 @@ public class RedShift extends AdvancedRobot {
     }
 
     // divide by the sum of weights which is a triangle number
-    result /= (double)totalWeight;
+    result /= totalWeight;
 
     return result;
   }
@@ -312,9 +292,7 @@ public class RedShift extends AdvancedRobot {
 
   @Override
   public void onHitByBullet(HitByBulletEvent event) {
-    if (!RedShift.IS_MELEE && this.targetInfo != null) {
-      this.targetInfo.addShotHit();
-    }
+    this.targetInfo.addShotHit();
   }
 
   @Override
@@ -396,14 +374,6 @@ public class RedShift extends AdvancedRobot {
     g.drawOval((int)(x - r), (int)(y - r), (int)(2 * r), (int)(2 * r));
 
     g.setColor(original);
-  }
-
-  /**
-   * Sets the isMelee static variable.
-   * @param melee is melee
-   */
-  private static void setMelee(boolean melee) {
-    RedShift.IS_MELEE = melee;
   }
 
   /**
