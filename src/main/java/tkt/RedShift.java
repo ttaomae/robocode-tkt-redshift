@@ -27,21 +27,21 @@ import tkt.util.RobotInfo;
  */
 public class RedShift extends AdvancedRobot {
   /** Print debug information if this value is true. */
-  private static final boolean DEBUG = false;
+  public static final boolean DEBUG = false;
   /** Preferred distance from the enemy. */
-  private static final double PREFERRED_DISTANCE = 200.0;
+  public static final double PREFERRED_DISTANCE = 200.0;
   /** Plus/minus distance from the preferred distance. */
-  private static final double DISTANCE_BUFFER = 50.0;
+  public static final double DISTANCE_BUFFER = 50.0;
   /** Maximum distance from the enemy where you will still fire. */
-  private static final double MAX_FIRING_DISTANCE = 400.0;
+  public static final double MAX_FIRING_DISTANCE = 400.0;
   /** Number of velocities being tracked. */
-  private static int NUM_VELOCITIES = 1;
+  public static int NUM_VELOCITIES = 1;
   /** Maps the number of velocities tracked to an accuracy. */
-  private static Map<Integer, Double> accuracies = new HashMap<Integer, Double>();
+  public static Map<Integer, Double> accuracies = new HashMap<Integer, Double>();
   /** The best enemy accuracy with dodging. */
-  private static double enemyAccuracyWithDodge = 0.0;
+  public static double enemyAccuracyWithDodge = 0.0;
   /** The best enemy accuracy without dodging. */
-  private static double enemyAccuracyWithoutDodge = 0.0;
+  public static double enemyAccuracyWithoutDodge = 0.0;
 
   /** Defines the direction to move. 1 is forward, -1 is backward */
   private int direction = 1;
@@ -79,14 +79,14 @@ public class RedShift extends AdvancedRobot {
     // on the first round
     if (this.getRoundNum() == 0) {
       // track 1 velocity
-      RedShift.setNumVelocities(1);
+      RedShift.NUM_VELOCITIES = 1;
       // don't dodge
       this.dodge = false;
     }
     // on the second round
     else if (this.getRoundNum() == 1) {
       // track 50 velocities
-      RedShift.setNumVelocities(50);
+      RedShift.NUM_VELOCITIES = 50;
       // dodge
       this.dodge = true;
     }
@@ -97,13 +97,13 @@ public class RedShift extends AdvancedRobot {
       // on even numbered rounds
       if (this.getRoundNum() % 2 == 0) {
         // try to find the best number of velocities to track, which will be between 1 and 100
-        RedShift.setNumVelocities(RedShift.getBestNumVelocities());
+        RedShift.NUM_VELOCITIES = RedShift.getBestNumVelocities();
       }
       // on odd numbered rounds
       else {
         // select a random number close to the best option
         int num = RedShift.getBestNumVelocities() + (this.rng.nextInt(21) - 10);
-        RedShift.setNumVelocities(Math.max(1, num));
+        RedShift.NUM_VELOCITIES = Math.max(1, num);
 
       }
 
@@ -377,13 +377,6 @@ public class RedShift extends AdvancedRobot {
   }
 
   /**
-   * Sets the number of velocities to keep track of.
-   * @param n new num
-   */
-  private static void setNumVelocities(int n) {
-    RedShift.NUM_VELOCITIES = n;
-  }
-  /**
    * Adds a new (# velocities, accuracy) pair to the map of accuracies.
    * If the key already exists, only add the new value if it is worse than the existing value.
    * This will ensure that you only keep track of the worst performance.
@@ -416,30 +409,6 @@ public class RedShift extends AdvancedRobot {
 
     result /= totalWeight;
     return Math.max(1, (int)result);
-  }
-
-  /**
-   * Returns the distance that this robot tries to stay from the target robot.
-   * @return the distance that this robot tries to stay from the target robot
-   */
-  public static double getPreferredDistance() {
-    return PREFERRED_DISTANCE;
-  }
-
-  /**
-   * Returns the acceptable deviation from the preferred distance.
-   * @return the acceptable deviation from the preferred distance
-   */
-  public static double getDistanceBuffer() {
-    return DISTANCE_BUFFER;
-  }
-
-  /**
-   * Returns the maximum firing distance.
-   * @return the maximum firing distance
-   */
-  public static double getMaxFiringDistance() {
-    return MAX_FIRING_DISTANCE;
   }
 
   /**

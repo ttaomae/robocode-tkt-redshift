@@ -68,7 +68,7 @@ public class TestRedShiftMovement extends RobotTestBed {
                                               robotB.getX(), robotB.getY());
 
     // if robots are within the preferred distance
-    if (Math.abs(RedShift.getPreferredDistance() - distance) < RedShift.getDistanceBuffer()) {
+    if (Math.abs(RedShift.MAX_FIRING_DISTANCE - distance) < RedShift.DISTANCE_BUFFER) {
       turnsAtPreferredDistance++;
     }
     else {

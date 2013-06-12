@@ -90,7 +90,7 @@ public class TestRedShiftFiring extends RobotTestBed {
         // 8 is the max velocity of a robot; add 16 to the max distance in case both robots
         // moved 8 pixels away from each other between the turn the setFire command was issued
         // and the turn when the bullet was actually fired
-        if (distance > RedShift.getMaxFiringDistance() + 16) {
+        if (distance > RedShift.MAX_FIRING_DISTANCE + 16) {
           this.firedOutsideMaxDistance = true;
         }
       }
