@@ -1,7 +1,6 @@
 package tkt;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -26,8 +25,6 @@ import tkt.util.RobotInfo;
  * @author Todd Taomae
  */
 public class RedShift extends AdvancedRobot {
-  /** Print debug information if this value is true. */
-  public static final boolean DEBUG = false;
   /** Preferred distance from the enemy. */
   public static final double PREFERRED_DISTANCE = 200.0;
   /** Plus/minus distance from the preferred distance. */
@@ -103,10 +100,6 @@ public class RedShift extends AdvancedRobot {
         RedShift.NUM_VELOCITIES = Math.max(1, num);
 
       }
-
-      if (RedShift.DEBUG) {
-        out.printf("velocities tracked: %d%n", NUM_VELOCITIES);
-      }
     }
 
     setTurnRadarRightRadians(Double.POSITIVE_INFINITY);
@@ -154,9 +147,6 @@ public class RedShift extends AdvancedRobot {
   private void setTurn(ScannedRobotEvent event) {
     // if it is a 1-v-1 and the target just fired
     if (this.targetInfo.justFired) {
-      if (RedShift.DEBUG) {
-        out.println("enemy fired");
-      }
       if (this.dodge) {
         this.direction *= -1;
       }
@@ -322,11 +312,6 @@ public class RedShift extends AdvancedRobot {
   @Override
   public void onRoundEnded(RoundEndedEvent event) {
 
-    if (RedShift.DEBUG) {
-      out.printf("my accuracy:              %f%n", this.getAccuracy());
-      out.printf("estimated enemy accuracy: %f%n", this.targetInfo.getAccuracy());
-    }
-
     // if the key is not in the map
     // or if the key existing value is greater than the new value
     if (!RedShift.accuracies.containsKey(NUM_VELOCITIES)
@@ -349,47 +334,6 @@ public class RedShift extends AdvancedRobot {
    */
   public double getAccuracy() {
     return (double) this.hits / (double) (this.hits + this.misses);
-  }
-
-  /**
-   * Draws debugging information.
-   *
-   * @param g graphics
-   */
-  @Override
-  public void onPaint(Graphics2D g) {
-    if (this.targetInfo == null) {
-      return;
-    }
-
-    if (RedShift.DEBUG) {
-      // draw preferred distance
-      drawCircle(this.targetInfo.x, this.targetInfo.y, PREFERRED_DISTANCE
-          - DISTANCE_BUFFER, Color.BLUE, g);
-      drawCircle(this.targetInfo.x, this.targetInfo.y, PREFERRED_DISTANCE
-          + DISTANCE_BUFFER, Color.BLUE, g);
-
-      // draw max firing distance
-      drawCircle(this.targetInfo.x, this.targetInfo.y, MAX_FIRING_DISTANCE, Color.RED, g);
-    }
-  }
-
-  /**
-   * Helper method to draw a circle.
-   *
-   * @param x x-coordinate of the center
-   * @param y y-coordinate of the center
-   * @param r radius
-   * @param c color
-   * @param g graphics
-   */
-  private void drawCircle(double x, double y, double r, Color c, Graphics2D g) {
-    Color original = g.getColor();
-
-    g.setColor(c);
-    g.drawOval((int) (x - r), (int) (y - r), (int) (2 * r), (int) (2 * r));
-
-    g.setColor(original);
   }
 
   /**
